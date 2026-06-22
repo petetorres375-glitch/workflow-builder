@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 """workflow_builder — Describe a repetitive task, get a ready-to-run Python script."""
 
-import json
 import logging
-import os
 import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
 
-from google import genai
-from google.genai import errors as genai_errors
 from dotenv import load_dotenv
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Confirm, Prompt
 from rich.syntax import Syntax
+
+from ai import generate
 
 load_dotenv()
 
@@ -32,49 +30,6 @@ logging.basicConfig(
 )
 
 console = Console()
-
-SYSTEM_PROMPT = """\
-You are a Python automation expert. The user will describe a repetitive task they want to automate.
-Generate a ready-to-run Python script that automates it.
-
-Return a JSON object with exactly two keys:
-- "filename": A short, descriptive snake_case filename ending in .py (e.g. "rename_photos.py"). No path, just the filename.
-- "script": The complete, ready-to-run Python script as a string. Use only the Python standard library unless the task clearly requires a third-party package. Include a brief comment at the top describing what the script does. Make it safe — no destructive operations without confirmation.
-
-Return only valid JSON. No markdown fences, no extra text.
-"""
-
-
-def generate(task: str) -> dict:
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        console.print("[red]GEMINI_API_KEY not set in .env[/red]")
-        sys.exit(1)
-
-    client = genai.Client(api_key=api_key)
-
-    models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"]
-    response = None
-    for model in models:
-        try:
-            with console.status(f"Generating script with {model}...", spinner="dots"):
-                response = client.models.generate_content(
-                    model=model,
-                    contents=f"{SYSTEM_PROMPT}\n\nTask: {task}",
-                )
-            break
-        except genai_errors.ServerError as e:
-            if "503" in str(e) and model != models[-1]:
-                console.print(f"[yellow]{model} unavailable, retrying with {models[models.index(model) + 1]}...[/yellow]")
-            else:
-                console.print(f"[red]API error: {e}[/red]")
-                sys.exit(1)
-
-    raw = response.text.strip()
-    if raw.startswith("```"):
-        raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-
-    return json.loads(raw)
 
 
 def save_script(filename: str, script: str) -> Path:
