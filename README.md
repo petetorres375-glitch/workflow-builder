@@ -50,6 +50,10 @@ Saved: workflows/rename_jpeg_to_jpg.py
 Run this now? [y/n]: y
 ```
 
+## Model
+
+Uses `gemini-2.5-flash` as the primary model. Automatically falls back to `gemini-2.5-flash-lite` on a 503 (model overload) before giving up.
+
 ## Project Structure
 
 ```
