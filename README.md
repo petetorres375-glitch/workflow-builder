@@ -78,6 +78,10 @@ workflow_builder/
     └── sessions.log  — task and filename log (gitignored)
 ```
 
+## Live Demo
+
+[https://web-production-515d4.up.railway.app/](https://web-production-515d4.up.railway.app/)
+
 ## Deploy to Railway
 
 1. Go to [railway.app](https://railway.app) → **New Project → Deploy from GitHub repo**
