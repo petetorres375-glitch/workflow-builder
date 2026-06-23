@@ -1,6 +1,6 @@
 # workflow_builder
 
-A Python CLI tool that turns a plain-English description of a repetitive task into a ready-to-run Python script. The script is displayed in the terminal with syntax highlighting, saved to the `workflows/` folder, and optionally executed immediately.
+A Python tool that turns a plain-English description of a repetitive task into a ready-to-run Python script. The script is displayed with syntax highlighting, saved to the `workflows/` folder, and available to download. Runs as a web app or from the command line.
 
 ## How it works
 
@@ -8,7 +8,7 @@ A Python CLI tool that turns a plain-English description of a repetitive task in
 2. The AI generates a complete Python script to automate it
 3. The script is displayed with syntax highlighting
 4. It's saved to `workflows/<descriptive_name>.py`
-5. You're asked: **Run this now? (y/n)**
+5. Download it directly from the browser (web) or run it immediately (CLI)
 
 ## Requirements
 
@@ -28,6 +28,16 @@ cp .env.example .env
 ```
 
 ## Usage
+
+**Web app:**
+
+```bash
+python app.py
+```
+
+Open `http://localhost:5052`, describe your task, and download the generated script.
+
+**CLI:**
 
 ```bash
 python main.py
@@ -59,6 +69,7 @@ Uses `gemini-2.5-flash` as the primary model. Automatically falls back to `gemin
 ```
 workflow_builder/
 ├── main.py           — CLI entry point
+├── app.py            — Flask web interface
 ├── requirements.txt
 ├── .gitignore
 ├── README.md
@@ -66,3 +77,10 @@ workflow_builder/
 └── logs/
     └── sessions.log  — task and filename log (gitignored)
 ```
+
+## Deploy to Railway
+
+1. Go to [railway.app](https://railway.app) → **New Project → Deploy from GitHub repo**
+2. Select this repository
+3. Add environment variables: `GEMINI_API_KEY` and `SECRET_KEY`
+4. Railway detects the `Procfile` and deploys automatically
