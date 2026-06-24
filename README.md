@@ -13,7 +13,7 @@ A Python tool that turns a plain-English description of a repetitive task into a
 ## Requirements
 
 - Python 3.12+
-- A free Gemini API key from [aistudio.google.com](https://aistudio.google.com)
+- An Anthropic API key from [console.anthropic.com](https://console.anthropic.com)
 
 ## Setup
 
@@ -24,7 +24,7 @@ cd workflow_builder
 pip install -r requirements.txt
 
 cp .env.example .env
-# Edit .env and add your Gemini API key
+# Edit .env and add your Anthropic API key
 ```
 
 ## Usage
@@ -62,7 +62,7 @@ Run this now? [y/n]: y
 
 ## Model
 
-Uses `gemini-2.5-flash` as the primary model. Automatically falls back to `gemini-2.5-flash-lite` on a 503 (model overload) before giving up.
+Uses `claude-haiku-4-5-20251001` via the Anthropic API. The system prompt is cached on every request to reduce latency and cost.
 
 ## Project Structure
 
@@ -86,5 +86,5 @@ workflow_builder/
 
 1. Go to [railway.app](https://railway.app) → **New Project → Deploy from GitHub repo**
 2. Select this repository
-3. Add environment variables: `GEMINI_API_KEY` and `SECRET_KEY`
+3. Add environment variables: `ANTHROPIC_API_KEY` and `SECRET_KEY`
 4. Railway detects the `Procfile` and deploys automatically
