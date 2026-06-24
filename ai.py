@@ -1,10 +1,8 @@
-"""Shared Gemini AI logic for workflow_builder."""
+"""Shared Claude AI logic for workflow_builder."""
 
 import json
-import os
 
-from google import genai
-from google.genai import errors as genai_errors
+import anthropic
 
 SYSTEM_PROMPT = """\
 You are a Python automation expert. The user will describe a repetitive task they want to automate.
@@ -17,27 +15,25 @@ Return a JSON object with exactly two keys:
 Return only valid JSON. No markdown fences, no extra text.
 """
 
-MODELS = ["gemini-2.5-flash", "gemini-2.5-flash-lite"]
+MODEL = "claude-haiku-4-5-20251001"
 
 
 def generate(task: str) -> dict:
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise RuntimeError("GEMINI_API_KEY not set in .env")
+    client = anthropic.Anthropic()
 
-    client = genai.Client(api_key=api_key)
-
-    for i, model in enumerate(MODELS):
-        try:
-            response = client.models.generate_content(
-                model=model,
-                contents=f"{SYSTEM_PROMPT}\n\nTask: {task}",
-            )
-            raw = response.text.strip()
-            if raw.startswith("```"):
-                raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-            return json.loads(raw)
-        except genai_errors.ServerError as e:
-            if "503" in str(e) and i < len(MODELS) - 1:
-                continue
-            raise
+    response = client.messages.create(
+        model=MODEL,
+        max_tokens=2048,
+        system=[
+            {
+                "type": "text",
+                "text": SYSTEM_PROMPT,
+                "cache_control": {"type": "ephemeral"},
+            }
+        ],
+        messages=[{"role": "user", "content": f"Task: {task}"}],
+    )
+    raw = response.content[0].text.strip()
+    if raw.startswith("```"):
+        raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+    return json.loads(raw)
